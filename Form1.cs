@@ -95,83 +95,98 @@ namespace Space_Plan_Sizer__.NET_4._8_
                         }
                         else
                         {
-                            txtInput.Text = txtInput.Text.TrimEnd();
-                            int ikw = index3 + 11;
-                            string q = txtInput.Text.Substring(index2 + 3, index3 - index2 - 5);
-                            string k = txtInput.Text.Substring(ikw, txtInput.Text.Length - ikw);
-                            string[] q1 = q.Split('\r');
-                            string[] k1 = k.Split('\r');
-                            int[] iq1 = new int[q1.Length];
-                            decimal[] dk1 = new decimal[k1.Length];
-                            decimal tkw = 0;
-                            bool isNumeric = true;
-
-                            // Trim the whitespace from array elements and convert to int32
-                            for (int i = 0; i < q1.Length; i++)
+                            if (txtInput.Text.Contains("Quantity") && !txtInput.Text.Contains("KilloWatt"))
                             {
-                                q1[i] = q1[i].Trim();
-                                if (q1[i] != "")
+                                MessageBox.Show("KiloWatt header is required. Please paste the KiloWatt field from the ELE file into the textbox.");
+                            }
+                            else
+                            {
+                                txtInput.Text = txtInput.Text.TrimEnd();
+                                int ikw = index3 + 11;
+                                string q = txtInput.Text.Substring(index2 + 3, index3 - index2 - 5);
+                                string k = txtInput.Text.Substring(ikw, txtInput.Text.Length - ikw);
+                                string[] q1 = q.Split('\r');
+                                string[] k1 = k.Split('\r');
+                                int[] iq1 = new int[q1.Length];
+                                decimal[] dk1 = new decimal[k1.Length];
+                                decimal tkw = 0;
+                                bool isNumeric = true;
+
+                                // Trim the whitespace from array elements and convert to int32
+                                for (int i = 0; i < q1.Length; i++)
                                 {
-                                    if (int.TryParse(q1[i], out int _))
+                                    q1[i] = q1[i].Trim();
+                                    if (q1[i] != "")
                                     {
-                                        iq1[i] = Convert.ToInt32(q1[i]);
+                                        if (int.TryParse(q1[i], out int _))
+                                        {
+                                            iq1[i] = Convert.ToInt32(q1[i]);
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("Detected a non-number under the Quantity header. Please make sure that all characters are numbers below the headers.");
+                                            isNumeric = false;
+                                            i = q1.Length; // stop loop
+                                            txtInput.Focus();
+                                        }
+                                    }               // Trim the whitespace from array elements and convert to decimal
+                                }
+
+                                for (int i = 0; i < k1.Length; i++)
+                                {
+                                    k1[i] = k1[i].Trim();
+                                    if (k1[i] != "")
+                                    {
+                                        if (decimal.TryParse(k1[i], out decimal _))
+                                        {
+                                            dk1[i] = Convert.ToDecimal(k1[i]);
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("Detected a non-number under the KiloWatt header. Please make sure that all characters are numbers below the headers.");
+                                            isNumeric = false;
+                                            i = k1.Length; // stop loop
+                                            txtInput.Focus();
+                                        }
+
+                                    }
+                                }
+
+                                if (isNumeric)
+                                {
+                                    if (iq1.Length == dk1.Length) // Make sure both arrays are equal in size
+                                    {
+                                        // Calculate total KW
+                                        for (int i = 0; i < iq1.Length; i++)
+                                        {
+                                            tkw += iq1[i] * dk1[i];
+                                        }
+
+                                        // Calculate using site formula
+                                        decimal kw = tkw / 2;
+                                        decimal sqft = kw * 50 / 3;
+
+                                        txtOutput.Text = "Sized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
                                     }
                                     else
                                     {
-                                        MessageBox.Show("Detected a non-number under the Quantity header. Please make sure that all characters are numbers below the headers.");
-                                        isNumeric = false;
-                                        i = q1.Length; // stop loop
+                                        MessageBox.Show("It appears that the amount kilowatt line items doesn't match the amount of quantity items. The amount of line items for Quantity should always match the KiloWatts.");
                                         txtInput.Focus();
                                     }
-                                    
-                                }
-                            }
 
-                            // Trim the whitespace from array elements and convert to decimal
-                            for (int i = 0; i < k1.Length; i++)
-                            {
-                                k1[i] = k1[i].Trim();
-                                if (k1[i] != "")
-                                {
-                                    if (decimal.TryParse(k1[i], out decimal _))
-                                    {
-                                        dk1[i] = Convert.ToDecimal(k1[i]);
-                                    }
-                                    else
-                                    {
-                                        MessageBox.Show("Detected a non-number under the KiloWatt header. Please make sure that all characters are numbers below the headers.");
-                                        isNumeric = false;
-                                        i = k1.Length; // stop loop
-                                        txtInput.Focus();
-                                    }
-                                    
                                 }
+
+
                             }
+                                    
+                                
+                            
+                            
+
+                           
 
                             
-                            if (isNumeric)
-                            {
-                                if (iq1.Length == dk1.Length) // Make sure both arrays are equal in size
-                                {
-                                    // Calculate total KW
-                                    for (int i = 0; i < iq1.Length; i++)
-                                    {
-                                        tkw += iq1[i] * dk1[i];
-                                    }
-
-                                    // Calculate using site formula
-                                    decimal kw = tkw / 2;
-                                    decimal sqft = kw * 50 / 3;
-
-                                    txtOutput.Text = "Sized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
-                                }
-                                else
-                                {
-                                    MessageBox.Show("It appears that the amount kilowatt line items doesn't match the amount of quantity items. The amount of line items for Quantity should always match the KiloWatts.");
-                                    txtInput.Focus();
-                                }
-                                
-                            }
+                            
                            
                         }
                         
