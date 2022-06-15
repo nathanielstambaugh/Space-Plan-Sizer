@@ -26,10 +26,10 @@ namespace Space_Plan_Sizer__.NET_4._8_
             }
             else
             {
-                if (!txtInput.Text.Contains("Quantity") && txtInput.Text.Contains("KiloWatt")) // if it only contains KiloWatt header
+                if (!txtInput.Text.Contains("Quantity") && txtInput.Text.Contains("KilloWatt")) // if it only contains KiloWatt header
                 {
                     txtInput.Text = txtInput.Text.TrimEnd();
-                    int ikw = txtInput.Text.IndexOf("K") + 10;
+                    int ikw = txtInput.Text.IndexOf("K") + 11;
                     string k = txtInput.Text.Substring(ikw, txtInput.Text.Length - ikw);
                     string[] k1 = k.Split('\r');
                     decimal[] dk1 = new decimal[k1.Length];
@@ -74,12 +74,6 @@ namespace Space_Plan_Sizer__.NET_4._8_
 
                         txtOutput.Text = "Warning: Quantity is missing. Assuming quantity of 1\r\n\r\nSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
                     }
-                    
-
-                   
-
-                    
-
                 }
                 else
                 {
@@ -102,7 +96,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
                         else
                         {
                             txtInput.Text = txtInput.Text.TrimEnd();
-                            int ikw = index3 + 10;
+                            int ikw = index3 + 11;
                             string q = txtInput.Text.Substring(index2 + 3, index3 - index2 - 5);
                             string k = txtInput.Text.Substring(ikw, txtInput.Text.Length - ikw);
                             string[] q1 = q.Split('\r');
@@ -208,6 +202,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
             if (txtInput.Text != "")
             {
                 btnClear.Enabled = true;
+                txtOutput.Text = "";
             }
             else
             {
