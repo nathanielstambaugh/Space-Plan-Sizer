@@ -42,7 +42,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
                         k1[i] = k1[i].Trim();
                         if (k1[i] != "")
                         {
-                            if (decimal.TryParse(k1[i], out decimal _)) // Check for decimal number
+                            if (decimal.TryParse(k1[i], out decimal _)) // Check for NaN
                             {
                                 dk1[i] = Convert.ToDecimal(k1[i]);
                             }
@@ -138,7 +138,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
                                     k1[i] = k1[i].Trim();
                                     if (k1[i] != "")
                                     {
-                                        if (decimal.TryParse(k1[i], out decimal _))
+                                        if (decimal.TryParse(k1[i], out decimal _)) // Check for NaN
                                         {
                                             dk1[i] = Convert.ToDecimal(k1[i]);
                                         }
