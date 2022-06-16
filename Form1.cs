@@ -21,7 +21,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
         {
             if (String.IsNullOrEmpty(txtInput.Text))
             {
-                MessageBox.Show("Please paste the KiloWatts and Quantity listed in the ELE file");
+                MessageBox.Show("Please paste the KiloWatts and Quantity listed in the ELE file","Do the needful!",MessageBoxButtons.OK,MessageBoxIcon.Error);
                 txtInput.Focus();
             }
             else
@@ -42,23 +42,23 @@ namespace Space_Plan_Sizer__.NET_4._8_
                         k1[i] = k1[i].Trim();
                         if (k1[i] != "")
                         {
-                            if (decimal.TryParse(k1[i], out decimal _))
+                            if (decimal.TryParse(k1[i], out decimal _)) // Check for decimal number
                             {
                                 dk1[i] = Convert.ToDecimal(k1[i]);
                             }
                             else
                             {
-                                MessageBox.Show("Detected a non-number in the textbox. Please make sure that all characters are numbers below the headers.");
+                                MessageBox.Show("Detected a non-number in the textbox. Please make sure that all characters are numbers below the headers.","Check yourself before you wreck yourself",MessageBoxButtons.OK,MessageBoxIcon.Error);
                                 isNumeric = false;
                                 i = k1.Length; // stop loop
                                 txtInput.Focus();
                             }
 
                         }
-                            
+
                     }
 
-                
+
 
                     // Calculate total KW with quantity assumption of 1
                     if (isNumeric)
@@ -83,21 +83,21 @@ namespace Space_Plan_Sizer__.NET_4._8_
 
                     if (!txtInput.Text.Contains("Quantity") && !txtInput.Text.Contains("KiloWatt")) // If it doesn't contain any headers
                     {
-                        MessageBox.Show("Couldn't find the column headers. Please include at least the KiloWatt header (Quantity is optional if not listed in ELE)");
+                        MessageBox.Show("Couldn't find the column headers. Please include at least the KiloWatt header (Quantity is optional if not listed in ELE)","Welp!",MessageBoxButtons.OK,MessageBoxIcon.Error);
                         txtInput.Focus();
                     }
                     else
                     {
                         if (index1 != 0 && index2 != 9) // check for length of the word 'Quantity'
                         {
-                            MessageBox.Show("The column headers appear to be out of order. Please make sure Quantity is first and KiloWatt is second.");
+                            MessageBox.Show("The column headers appear to be out of order. Please make sure Quantity is first and KiloWatt is second.","It's okay, humans make mistakes",MessageBoxButtons.OK,MessageBoxIcon.Error);
                             txtInput.Focus();
                         }
                         else
                         {
                             if (txtInput.Text.Contains("Quantity") && !txtInput.Text.Contains("KilloWatt"))
                             {
-                                MessageBox.Show("KiloWatt header is required. Please paste the KiloWatt field from the ELE file into the textbox.");
+                                MessageBox.Show("KiloWatt header is required. Please paste the KiloWatt field from the ELE file into the textbox.","Danger Will Robinson!",MessageBoxButtons.OK,MessageBoxIcon.Error);
                             }
                             else
                             {
@@ -124,14 +124,15 @@ namespace Space_Plan_Sizer__.NET_4._8_
                                         }
                                         else
                                         {
-                                            MessageBox.Show("Detected a non-number under the Quantity header. Please make sure that all characters are numbers below the headers.");
+                                            MessageBox.Show("Detected a non-number under the Quantity header. Please make sure that all characters are numbers below the headers.","You did a oopsie!",MessageBoxButtons.OK,MessageBoxIcon.Error);
                                             isNumeric = false;
                                             i = q1.Length; // stop loop
                                             txtInput.Focus();
                                         }
-                                    }               // Trim the whitespace from array elements and convert to decimal
+                                    }              
                                 }
 
+                                 // Trim the whitespace from array elements and convert to decimal
                                 for (int i = 0; i < k1.Length; i++)
                                 {
                                     k1[i] = k1[i].Trim();
@@ -143,7 +144,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
                                         }
                                         else
                                         {
-                                            MessageBox.Show("Detected a non-number under the KiloWatt header. Please make sure that all characters are numbers below the headers.");
+                                            MessageBox.Show("Detected a non-number under the KiloWatt header. Please make sure that all characters are numbers below the headers.","Oopsie daisy",MessageBoxButtons.OK,MessageBoxIcon.Error);
                                             isNumeric = false;
                                             i = k1.Length; // stop loop
                                             txtInput.Focus();
@@ -170,7 +171,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
                                     }
                                     else
                                     {
-                                        MessageBox.Show("It appears that the amount kilowatt line items doesn't match the amount of quantity items. The amount of line items for Quantity should always match the KiloWatts.");
+                                        MessageBox.Show("It appears that the amount kilowatt line items doesn't match the amount of quantity items. The amount of line items for Quantity should always match the KiloWatts.","Mistakes were made",MessageBoxButtons.OK,MessageBoxIcon.Error);
                                         txtInput.Focus();
                                     }
 
@@ -178,18 +179,18 @@ namespace Space_Plan_Sizer__.NET_4._8_
 
 
                             }
-                                    
-                                
-                            
-                            
 
-                           
 
-                            
-                            
-                           
+
+
+
+
+
+
+
+
                         }
-                        
+
 
 
 
@@ -198,13 +199,13 @@ namespace Space_Plan_Sizer__.NET_4._8_
 
 
 
-               
+
 
 
             }
 
-        
-                    }
+
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -217,11 +218,11 @@ namespace Space_Plan_Sizer__.NET_4._8_
             if (txtInput.Text != "")
             {
                 btnClear.Enabled = true;
-                txtOutput.Text = "";
             }
             else
             {
                 btnClear.Enabled = false;
+                txtOutput.Text = "";
             }
         }
     }
