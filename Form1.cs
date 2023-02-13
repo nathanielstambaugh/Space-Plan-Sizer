@@ -21,180 +21,292 @@ namespace Space_Plan_Sizer__.NET_4._8_
         {
             if (String.IsNullOrEmpty(txtInput.Text))
             {
-                MessageBox.Show("Please paste the KiloWatts and Quantity listed in the ELE file","Do the needful!",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                MessageBox.Show("Please paste the KiloWatts, Quantity, and Action headers listed in the ELE file","Do the needful!",MessageBoxButtons.OK,MessageBoxIcon.Error);
                 txtInput.Focus();
             }
             else
             {
-                if (!txtInput.Text.Contains("Quantity") && txtInput.Text.Contains("KilloWatt")) // if it only contains KiloWatt header
+                if (!txtInput.Text.Contains("Quantity") && txtInput.Text.Contains("KilloWatt") && txtInput.Text.Contains("Action")) // if it only contains KiloWatt and Action header
                 {
-                    txtInput.Text = txtInput.Text.TrimEnd();
-                    int ikw = txtInput.Text.IndexOf("K") + 11;
-                    string k = txtInput.Text.Substring(ikw, txtInput.Text.Length - ikw);
-                    string[] k1 = k.Split('\r');
-                    decimal[] dk1 = new decimal[k1.Length];
-                    decimal tkw = 0;
-                    bool isNumeric = true;
-
-                    // Trim the whitespace from array elements and convert to decimal
-                    for (int i = 0; i < k1.Length; i++)
+                    if (txtInput.Text.IndexOf("Action") == 0)
                     {
-                        k1[i] = k1[i].Trim();
-                        if (k1[i] != "")
+                        txtInput.Text = txtInput.Text.TrimEnd();
+                        int ikw = txtInput.Text.IndexOf("K") + 11;
+                        int action = txtInput.Text.IndexOf("A") + 8;
+                        string k = txtInput.Text.Substring(ikw, txtInput.Text.Length - ikw);
+                        string a = txtInput.Text.Substring(action, txtInput.Text.IndexOf("K") - action - 2);
+                        string[] k1 = k.Split('\r');
+                        string[] a1 = a.Split('\r');
+                        decimal[] dk1 = new decimal[k1.Length];
+                        decimal tkw = 0;
+                        bool isNumeric = true;
+                        bool isCharacter = true;
+
+
+                        // Trim the whitespace from array elements and convert to decimal
+                        for (int i = 0; i < k1.Length; i++)
                         {
-                            if (decimal.TryParse(k1[i], out decimal _)) // Check for NaN
+                            k1[i] = k1[i].Trim();
+                            if (k1[i] != "")
                             {
-                                dk1[i] = Convert.ToDecimal(k1[i]);
+                                if (decimal.TryParse(k1[i], out decimal _)) // Check for NaN
+                                {
+                                    dk1[i] = Convert.ToDecimal(k1[i]);
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Detected a non-number under the Kilowatt header. Please make sure that all characters are numbers below the kilowatt header.", "Check yourself before you wreck yourself", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    isNumeric = false;
+                                    i = k1.Length; // stop loop
+                                    txtInput.Focus();
+                                }
+
+                            }
+
+                        }
+
+                        // Trim the whitespace from Action array
+                        for (int i = 0; i < a1.Length; i++)
+                        {
+                            a1[i] = a1[i].Trim();
+                            if (a1[i] != "")
+                            {
+                                if (!a1[i].Equals("Remove"))
+                                {
+
+                                    if (!a1[i].Equals("Install"))
+                                    {
+                                        MessageBox.Show("Could not detect Install or Remove under Action header. Please make sure that all characters are correct below the headers.", "Doh!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        isCharacter = false;
+                                        i = a1.Length; // stop loop
+                                    }
+
+                                }
+
+
+                            }
+
+                        }
+                        // Calculate total KW with quantity assumption of 1
+                        if (isNumeric && isCharacter)
+                        {
+                            if (a1.Length == dk1.Length) // Check to make sure both arrays are equal length
+                            {
+                                for (int i = 0; i < dk1.Length; i++)
+                                {
+                                    if (a1[i].Equals("Install"))
+                                    {
+                                        tkw += dk1[i] * 1;
+                                    }
+                                    else if (a1[i].Equals("Remove"))
+                                    {
+                                        tkw -= dk1[i] * 1;
+                                    }
+                                }
+                                // Calculate using site formula
+                                decimal kw = tkw / 2;
+                                decimal sqft = kw * 50 / 3;
+
+                                // Convert negative numbers to positive numbers if needed
+                                if (kw < 0 || sqft < 0)
+                                {
+                                    kw = Math.Abs(kw);
+                                    sqft = Math.Abs(sqft);
+                                    txtOutput.Text = "*******There is a net negative detected in the sizing. This means you will be removing space (possibly).*******\n\r\n\r\n\rWarning: Quantity is missing. Assuming quantity of 1\r\n\r\nSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
+                                }
+                                else
+                                {
+                                    txtOutput.Text = "Warning: Quantity is missing. Assuming quantity of 1\\r\\n\\r\\nSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
+                                }
                             }
                             else
                             {
-                                MessageBox.Show("Detected a non-number in the textbox. Please make sure that all characters are numbers below the headers.","Check yourself before you wreck yourself",MessageBoxButtons.OK,MessageBoxIcon.Error);
-                                isNumeric = false;
-                                i = k1.Length; // stop loop
+                                MessageBox.Show("It appears that the amount header line items doesn't match. The amount of line items for Quantity, KiloWatts and Action should always match each other.", "Mistakes were made", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 txtInput.Focus();
                             }
 
                         }
-
-                    }
-
-
-
-                    // Calculate total KW with quantity assumption of 1
-                    if (isNumeric)
-                    {
-                        for (int i = 0; i < dk1.Length; i++)
-                        {
-                            tkw += dk1[i] * 1;
-                        }
-
-                        // Calculate using site formula
-                        decimal kw = tkw / 2;
-                        decimal sqft = kw * 50 / 3;
-
-                        txtOutput.Text = "Warning: Quantity is missing. Assuming quantity of 1\r\n\r\nSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
-                    }
-                }
-                else
-                {
-                    int index1 = txtInput.Text.IndexOf("Q");
-                    int index2 = txtInput.Text.IndexOf("y");
-                    int index3 = txtInput.Text.IndexOf("K");
-
-                    if (!txtInput.Text.Contains("Quantity") && !txtInput.Text.Contains("KiloWatt")) // If it doesn't contain any headers
-                    {
-                        MessageBox.Show("Couldn't find the column headers. Please include at least the KiloWatt header (Quantity is optional if not listed in ELE)","Welp!",MessageBoxButtons.OK,MessageBoxIcon.Error);
-                        txtInput.Focus();
                     }
                     else
                     {
-                        if (index1 != 0 && index2 != 9) // check for length of the word 'Quantity'
+                        MessageBox.Show("The column headers appear to be out of order. Please make sure Action is first and Quantity is second (Optional) and Kilowatt is third.","It's okay, humans make mistakes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    
+
+
+
+                    
+                }
+                else
+                {
+                    if (!txtInput.Text.Contains("KilloWatt"))
+                    {
+                        MessageBox.Show("Kilowatt header is required. Please paste the Kilowatt field from the ELE file into the textbox.","Danger Will Robinson!",MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        int index1 = txtInput.Text.IndexOf("A");
+                        int index2 = txtInput.Text.IndexOf("n");
+                        int index3 = txtInput.Text.IndexOf("Q");
+                        int index4 = txtInput.Text.IndexOf("y");
+                        int index5 = txtInput.Text.IndexOf("K");
+
+                        if (!txtInput.Text.Contains("Quantity") && !txtInput.Text.Contains("KiloWatt") && !txtInput.Text.Contains("Action")) // If it doesn't contain any headers
                         {
-                            MessageBox.Show("The column headers appear to be out of order. Please make sure Quantity is first and KiloWatt is second.","It's okay, humans make mistakes",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                            MessageBox.Show("Couldn't find the column headers. Please include at least the KiloWatt header and Action header (Quantity is optional if not listed in ELE)", "Welp!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             txtInput.Focus();
                         }
                         else
                         {
-                            if (txtInput.Text.Contains("Quantity") && !txtInput.Text.Contains("KilloWatt"))
+                            if (txtInput.Text.IndexOf("Action") != 0) // check to make sure Action is first array element in textbox
                             {
-                                MessageBox.Show("KiloWatt header is required. Please paste the KiloWatt field from the ELE file into the textbox.","Danger Will Robinson!",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                                MessageBox.Show("The column headers appear to be out of order. Please make sure Action is first and Quantity is second (Optional) and Kilowatt is third.", "It's okay, humans make mistakes", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                txtInput.Focus();
                             }
                             else
                             {
-                                txtInput.Text = txtInput.Text.TrimEnd();
-                                int ikw = index3 + 11;
-                                string q = txtInput.Text.Substring(index2 + 3, index3 - index2 - 5);
-                                string k = txtInput.Text.Substring(ikw, txtInput.Text.Length - ikw);
-                                string[] q1 = q.Split('\r');
-                                string[] k1 = k.Split('\r');
-                                int[] iq1 = new int[q1.Length];
-                                decimal[] dk1 = new decimal[k1.Length];
-                                decimal tkw = 0;
-                                bool isNumeric = true;
-
-                                // Trim the whitespace from array elements and convert to int32
-                                for (int i = 0; i < q1.Length; i++)
+                                if (txtInput.Text.Contains("Quantity") && !txtInput.Text.Contains("KilloWatt") && txtInput.Text.Contains("Action"))
                                 {
-                                    q1[i] = q1[i].Trim();
-                                    if (q1[i] != "")
+                                    MessageBox.Show("KiloWatt header is required. Please paste the KiloWatt field from the ELE file into the textbox.", "Danger Will Robinson!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                                else
+                                {
+                                    txtInput.Text = txtInput.Text.TrimEnd();
+                                    int ikw = index5 + 11;
+                                    string q = txtInput.Text.Substring(index4 + 3, index5 - index4 - 5);
+                                    string k = txtInput.Text.Substring(ikw, txtInput.Text.Length - ikw);
+                                    string a = txtInput.Text.Substring(index2 + 3, index3 - index2 - 5);
+                                    string[] q1 = q.Split('\r');
+                                    string[] k1 = k.Split('\r');
+                                    string[] a1 = a.Split('\r');
+                                    int[] iq1 = new int[q1.Length];
+                                    decimal[] dk1 = new decimal[k1.Length];
+                                    decimal tkw = 0;
+                                    bool isNumeric = true;
+                                    bool isCharacter = true;
+
+                                    // Trim the whitespace from array elements and convert to int32
+                                    for (int i = 0; i < q1.Length; i++)
                                     {
-                                        if (int.TryParse(q1[i], out int _))
+                                        q1[i] = q1[i].Trim();
+                                        if (q1[i] != "")
                                         {
-                                            iq1[i] = Convert.ToInt32(q1[i]);
+                                            if (int.TryParse(q1[i], out int _))
+                                            {
+                                                iq1[i] = Convert.ToInt32(q1[i]);
+                                            }
+                                            else
+                                            {
+                                                MessageBox.Show("Detected a non-number under the Quantity header. Please make sure that all characters are numbers below the quantity header.", "You did a oopsie!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                isNumeric = false;
+                                                i = q1.Length; // stop loop
+                                                txtInput.Focus();
+                                            }
+                                        }
+                                    }
+
+                                    // Trim the whitespace from array elements and convert to decimal
+                                    for (int i = 0; i < k1.Length; i++)
+                                    {
+                                        k1[i] = k1[i].Trim();
+                                        if (k1[i] != "")
+                                        {
+                                            if (decimal.TryParse(k1[i], out decimal _)) // Check for NaN
+                                            {
+                                                dk1[i] = Convert.ToDecimal(k1[i]);
+                                            }
+                                            else
+                                            {
+                                                MessageBox.Show("Detected a non-number under the KiloWatt header. Please make sure that all characters are numbers below the Kilowatt header.", "Oopsie daisy", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                isNumeric = false;
+                                                i = k1.Length; // stop loop
+                                                txtInput.Focus();
+                                            }
+
+                                        }
+                                    }
+
+                                    // Trim the whitespace from array Action
+                                    for (int i = 0; i < a1.Length; i++)
+                                    {
+                                        a1[i] = a1[i].Trim();
+                                        if (!a1[i].Equals("Remove"))
+                                        {
+
+                                            if (!a1[i].Equals("Install"))
+                                            {
+                                                MessageBox.Show("Could not detect Install or Remove under Action header. Please make sure that all characters are correct below the headers.", "Doh!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                                isCharacter = false;
+                                                i = a1.Length; // stop loop
+                                            }
+
+                                        }
+                                    }
+
+                                    if (isNumeric && isCharacter)
+                                    {
+                                        if (iq1.Length == dk1.Length && iq1.Length == a1.Length && dk1.Length == a1.Length) // Make sure all arrays are equal length
+                                        {
+                                            // Calculate total KW
+                                            for (int i = 0; i < iq1.Length; i++)
+                                            {
+                                                if (a1[i].Equals("Install"))
+                                                {
+                                                    tkw += iq1[i] * dk1[i];
+                                                }
+                                                if (a1[i].Equals("Remove"))
+                                                {
+                                                    tkw -= iq1[i] * dk1[i];
+                                                }
+
+                                            }
+
+                                            // Calculate using site formula
+                                            decimal kw = tkw / 2;
+                                            decimal sqft = kw * 50 / 3;
+
+                                            // Convert negative numbers to positive numbers if needed
+                                            if (kw < 0 || sqft < 0)
+                                            {
+                                                kw = Math.Abs(kw);
+                                                sqft = Math.Abs(sqft);
+                                                txtOutput.Text = "*******There is a net negative detected in the sizing. This means you will be removing space (possibly).*******\n\r\n\r\n\rSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
+                                            }
+                                            else
+                                            {
+                                                txtOutput.Text = "Sized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
+                                            }
+
+
                                         }
                                         else
                                         {
-                                            MessageBox.Show("Detected a non-number under the Quantity header. Please make sure that all characters are numbers below the headers.","You did a oopsie!",MessageBoxButtons.OK,MessageBoxIcon.Error);
-                                            isNumeric = false;
-                                            i = q1.Length; // stop loop
-                                            txtInput.Focus();
-                                        }
-                                    }              
-                                }
-
-                                 // Trim the whitespace from array elements and convert to decimal
-                                for (int i = 0; i < k1.Length; i++)
-                                {
-                                    k1[i] = k1[i].Trim();
-                                    if (k1[i] != "")
-                                    {
-                                        if (decimal.TryParse(k1[i], out decimal _)) // Check for NaN
-                                        {
-                                            dk1[i] = Convert.ToDecimal(k1[i]);
-                                        }
-                                        else
-                                        {
-                                            MessageBox.Show("Detected a non-number under the KiloWatt header. Please make sure that all characters are numbers below the headers.","Oopsie daisy",MessageBoxButtons.OK,MessageBoxIcon.Error);
-                                            isNumeric = false;
-                                            i = k1.Length; // stop loop
+                                            MessageBox.Show("It appears that the amount header line items doesn't match. The amount of line items for Quantity, KiloWatts and Action should always match each other.", "Mistakes were made", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                             txtInput.Focus();
                                         }
 
                                     }
-                                }
 
-                                if (isNumeric)
-                                {
-                                    if (iq1.Length == dk1.Length) // Make sure both arrays are equal in size
-                                    {
-                                        // Calculate total KW
-                                        for (int i = 0; i < iq1.Length; i++)
-                                        {
-                                            tkw += iq1[i] * dk1[i];
-                                        }
-
-                                        // Calculate using site formula
-                                        decimal kw = tkw / 2;
-                                        decimal sqft = kw * 50 / 3;
-
-                                        txtOutput.Text = "Sized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
-                                    }
-                                    else
-                                    {
-                                        MessageBox.Show("It appears that the amount kilowatt line items doesn't match the amount of quantity items. The amount of line items for Quantity should always match the KiloWatts.","Mistakes were made",MessageBoxButtons.OK,MessageBoxIcon.Error);
-                                        txtInput.Focus();
-                                    }
 
                                 }
+
+
+
+
+
+
+
+
 
 
                             }
-
-
-
-
-
-
 
 
 
 
                         }
-
-
-
-
                     }
+                    
                 }
 
 

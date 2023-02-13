@@ -50,6 +50,7 @@
             this.txtInput.Location = new System.Drawing.Point(15, 12);
             this.txtInput.Multiline = true;
             this.txtInput.Name = "txtInput";
+            this.txtInput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtInput.Size = new System.Drawing.Size(371, 155);
             this.txtInput.TabIndex = 7;
             this.txtInput.TextChanged += new System.EventHandler(this.txtInput_TextChanged);
