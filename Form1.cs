@@ -112,7 +112,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
                                 {
                                     kw = Math.Abs(kw);
                                     sqft = Math.Abs(sqft);
-                                    txtOutput.Text = "*******There is a net negative detected in the sizing. This means you will be removing space (possibly).*******\n\r\n\r\n\rWarning: Quantity is missing. Assuming quantity of 1\r\n\r\nSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
+                                    txtOutput.Text = "*******Net Negative.*******\n\r\n\r\n\rWarning: Quantity is missing. Assuming quantity of 1\r\n\r\nSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
                                 }
                                 else
                                 {
@@ -270,7 +270,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
                                             {
                                                 kw = Math.Abs(kw);
                                                 sqft = Math.Abs(sqft);
-                                                txtOutput.Text = "*******There is a net negative detected in the sizing. This means you will be removing space (possibly).*******\n\r\n\r\n\rSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
+                                                txtOutput.Text = "*******Net Negative.*******\n\r\n\r\n\rSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
                                             }
                                             else
                                             {
