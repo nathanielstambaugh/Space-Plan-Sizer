@@ -116,7 +116,7 @@ namespace Space_Plan_Sizer__.NET_4._8_
                                 }
                                 else
                                 {
-                                    txtOutput.Text = "Warning: Quantity is missing. Assuming quantity of 1\\r\\n\\r\\nSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
+                                    txtOutput.Text = "Warning: Quantity is missing. Assuming quantity of 1\r\n\r\nSized at " + Convert.ToString(kw) + " kw and " + Convert.ToString(Math.Round(sqft, 1)) + " sqft.";
                                 }
                             }
                             else
